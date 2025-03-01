@@ -1,4 +1,6 @@
-﻿using MassTransit;
+﻿using Catalog.API.Handlers;
+using Catalog.API.Repositories;
+using MassTransit;
 using Microsoft.OpenApi.Models;
 using RabbitMQ.Client;
 
@@ -24,7 +26,12 @@ namespace Catalog.API
                         sqlOptions.MigrationsAssembly(typeof(Startup).GetTypeInfo().Assembly.GetName().Name);
                         //Configuring Connection Resiliency: https://docs.microsoft.com/en-us/ef/core/miscellaneous/connection-resiliency 
                         sqlOptions.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), errorNumbersToAdd: null);
-                    }));
+                    }), ServiceLifetime.Transient);
+
+            
+            services.AddTransient<IPlatesRepository, PlatesRepository>();
+            services.AddSingleton<IPromotionService, PromotionService>();
+            services.AddSingleton<IMarkUpService, MarkUpService>();
 
             services.AddSwaggerGen(options =>
             {
@@ -52,9 +59,9 @@ namespace Catalog.API
 
             services.AddMassTransit(x =>
             {
-                //x.AddConsumer<ConsumerClass>();
-
-                //ADD CONSUMERS HERE
+               
+                x.AddConsumers(typeof(Startup).Assembly);
+               
                 x.UsingRabbitMq((context, cfg) =>
                 {
                     cfg.Host(Configuration["EventBusConnection"], "/", h =>
@@ -76,6 +83,9 @@ namespace Catalog.API
             });
 
             services.AddMassTransitHostedService();
+
+            //I've not added these as interfaces as there will only be concrete implementations of the handler
+            services.AddScoped<GetPlatesHandler>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

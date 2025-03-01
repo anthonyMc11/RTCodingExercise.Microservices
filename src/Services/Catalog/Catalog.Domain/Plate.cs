@@ -13,5 +13,16 @@
         public string? Letters { get; set; }
 
         public int Numbers { get; set; }
+
+        public Availability Availability { get; set; }
+
+    }
+
+    public enum Availability
+    {
+        Available = 0,
+        Reserved = 1,
+        Sold = 2,
+        Revoked = 3,
     }
 }

@@ -1,4 +1,4 @@
-string Namespace = typeof(Startup).Namespace;
+string Namespace = typeof(Startup).Namespace!;
 string AppName = Namespace.Substring(Namespace.LastIndexOf('.', Namespace.LastIndexOf('.') - 1) + 1);
 
 var configuration = GetConfiguration();
@@ -13,9 +13,9 @@ try
     Log.Information("Applying migrations ({ApplicationContext})...", AppName);
     host.MigrateDbContext<ApplicationDbContext>((context, services) =>
     {
-        var env = services.GetService<IWebHostEnvironment>();
-        var logger = services.GetService<ILogger<ApplicationDbContextSeed>>();
-        var settings = services.GetService<IOptions<AppSettings>>();
+        var env = services.GetRequiredService<IWebHostEnvironment>();
+        var logger = services.GetRequiredService<ILogger<ApplicationDbContextSeed>>();
+        var settings = services.GetRequiredService<IOptions<AppSettings>>();
 
         new ApplicationDbContextSeed()
             .SeedAsync(context, env, logger, settings)
