@@ -15,7 +15,7 @@ namespace Catalog.UnitTests.Handlers
             var context = new Mock<ApplicationDbContext>(optionsBuilder.Options);
             context.SetupGet(x => x.Plates).ReturnsDbSet(_plateDb);
 
-            _mockPlatesRepository.Setup(s => s.AsQueryable()).Returns(() => context.Object.Plates);
+            _mockPlatesRepository.Setup(s => s.Get()).Returns(() => context.Object.Plates);
             _sut = new GetPlatesHandler(_mockPlatesRepository.Object, _mockPromotionService.Object, _mockMarkUpService.Object);
         }
 
